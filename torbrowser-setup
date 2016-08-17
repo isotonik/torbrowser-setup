@@ -1,0 +1,360 @@
+#!/bin/bash
+
+# Type: Shell Script
+# Description: Install Tor Browser in Linux (Compatible with all distributions.)
+# Program Name: torbrower-setup
+# Release Status: 1.0.0
+# Project URL: https://github.com/williamcanin/torbrowser-setup.git
+# URL Script: http://git.io/torbrowser-setup
+
+# Author: William C. Canin
+#   E-Mail: william.costa.canin@gmail.com
+#   WebSite: http://williamcanin.github.io
+#   GitHub: https://github.com/williamcanin
+
+# Copyright © 2016 William C. Canin
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# BEGIN {{{{{
+
+# Variables author
+email="william.costa.canin@gmail.com"
+website="http://williamcanin.com"
+github="https://github.com/williamcanin"
+# Variables script
+PWD_LOCAL="$(echo $PWD)"
+program_name="Tor Browser Setup"
+version="1.0.0"
+prompt1="Enter your option: "
+year_current="$(date +%Y)"
+# Colors type
+Bold=$(tput bold)
+Underline=$(tput sgr 0 1)
+None=$(tput sgr0)
+# Regular colors
+Red=$(tput setaf 1)
+Green=$(tput setaf 2)
+Yellow=$(tput setaf 3)
+Blue=$(tput setaf 4)
+Purple=$(tput setaf 5)
+Cyan=$(tput setaf 6)
+White=$(tput setaf 7)
+# Colors bold
+BRed=${Bold}$(tput setaf 1)
+BGreen=${Bold}$(tput setaf 2)
+BYellow=${Bold}$(tput setaf 3)
+BBlue=${Bold}$(tput setaf 4)
+BPurple=${Bold}$(tput setaf 5)
+BCyan=${Bold}$(tput setaf 6)
+BWhite=${Bold}$(tput setaf 7)
+# Messages
+Error="[${BRed} Error ${None}]"
+Warning="[${BYellow} Warning ${None}]"
+Info="[${BCyan} Info ${None}]"
+Ok="[${BGreen} Ok ${None}]"
+
+# Function show Credits {{{{
+function _credits(){
+cat << EOT
+
+   ---------------------------------------------------------
+  |          ${program_name} - Version ${version}              |
+   ---------------------------------------------------------
+  |                         Credits:                        |
+  |                                                         |
+  |           Author: William da Costa Canin                |
+  |           E-Mail: $email         |
+  |           Website: $website              |
+  |           GitHub: $github       |
+  |           Locale: Brazil - SP                           |
+  |                                                         |
+  |                                                         |
+  |   ${program_name} © 2015-$year_current - All Right Reserved.   |
+  |  Doc: http://github.com/williamcanin/torbrowser-setup   |
+  |---------------------------------------------------------|
+
+EOT
+}
+# }}}}
+
+# Function show help {{{{
+function _help(){
+cat << EOT
+
+ ---------------------------------------------------------
+|       Help  -  ${program_name} - Version ${version}        |
+ ---------------------------------------------------------
+
+ Usage: $0 [options]
+
+  Options:
+
+    install | -i     Performs download the latest stable version
+                     of Tor Browser and make installing.
+
+    uninstall | -u   Uninstall Tor Browser, case has been installed
+                     with this script
+
+    credits           A list of credits of this program.
+
+    help              Output this instructions.
+
+EOT
+}
+# }}}}
+
+# Checks if the operating system is Linux {{{{
+function _check_os(){
+  os=$(uname -o)
+  if [[ $os == "GNU/Linux" ]] || [[ $os == "Linux" ]]; then
+    printf "${Ok} Linux Operating System detected!${None}\n"
+  else
+    printf "${Error} ${Red} You can not run this script on a different operating system Linux.${None}\n"
+    exit 1
+  fi
+}
+# }}}}
+
+# Function capture lasted version stable of Tor Browser {{{{
+function _catch_version_tor_browser(){
+  printf "${Info} ${BCyan} Capturing the latest stable version ...${None}\n\n"
+  VERSION=$(curl https://www.torproject.org/download/download.html | sed -rn "s#.*Version ([0-9].[0-9].[0-9]+)..*#\1#p" | sort | uniq)
+  printf "${Ok} Done!${None}\n"
+}
+# }}}}
+
+# Function detect the architecture{{{{
+function _catch_architecture(){
+  if [ "$(uname -m)" = "x86_64" ]; then
+    ARCHITECTURE="64"
+  else
+    ARCHITECTURE="32"
+  fi
+}
+# }}}}
+
+# Function select language for download {{{{
+function _select_language(){
+  PS3="$prompt1"
+  printf "${Info} ${BCyan} Choose your language: ${None}\n"
+  select runner in "English" "Portuguese" "Español" "Deutsch" "Français" "Italiano" "Korean" "Nederlands" "Polish" "Pycckuũ" "Türkçe" "Vietnamese" "日本の" "中文"; do
+    case $runner in
+      "English" )
+        LANG="en-US"
+        break
+        ;;
+      "Portuguese" )
+        LANG="pt-PT"
+        break
+        ;;
+      "Español" )
+        LANG="es-ES"
+        break
+        ;;
+      "Deutsch" )
+        LANG="de"
+        break
+        ;;
+      "Français" )
+        LANG="fr"
+        break
+        ;;
+      "Italiano" )
+        LANG="it"
+        break
+        ;;
+      "Korean" )
+        LANG="ko"
+        break
+        ;;
+      "Nederlands" )
+        LANG="nl"
+        break
+        ;;
+      "Polish" )
+        LANG="pl"
+        break
+        ;;
+      "Pycckuũ" )
+        LANG="ru"
+        break
+        ;;
+      "Türkçe" )
+        LANG="tr"
+        break
+        ;;
+      "Vietnamese" )
+        LANG="vi"
+        break
+        ;;
+      "日本の" )
+        LANG="ja"
+        break
+        ;;
+      "中文" )
+        LANG="zh-CN"
+        break
+        ;;
+      * )
+        printf "${Error} ${BRed} Option invalid. ${None}\n"
+        ;;
+    esac
+  done
+}
+# }}}}
+
+# Function capture url of download {{{{
+function _catch_url(){
+  URL_PKG="https://dist.torproject.org/torbrowser/${VERSION}/tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}.tar.xz"
+}
+# }}}}
+
+# Function prepare directory for download and installlation {{{{
+function _prepare(){
+  if [[ ! -d "${PWD_LOCAL}/tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}" ]]; then
+    mkdir -p ${PWD_LOCAL}/tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}
+  fi
+  if [[ ! -d "$HOME/.tor-browser" ]]; then
+    mkdir -p $HOME/.tor-browser
+  fi
+}
+# }}}}
+
+# Function enable Tor Browser for root user {{{{
+# NOTE: This function is very important to note because if the script "start-tor-browser"
+# to be added or removed one line, this function will have to be changed also.
+## Delete lines 94 to 97 of the file "start-to-browser" ##
+function _enable_tor_root(){
+ sed -i "94,97d" /opt/tor-browser/Browser/start-tor-browser
+}
+# }}}}
+
+# Function start download Tor Brower {{{{
+function _download_tor_browser(){
+  cd ${PWD_LOCAL}/tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}
+  wget -c $URL_PKG
+}
+# }}}}
+
+# Function clean files download (cache) {{{{
+function _clean_download_file(){
+  PS3="$prompt1"
+  printf "${Info} ${BCyan} Do you want to delete the downloaded files?${None}\n"
+  select runner in "Yes" "No"; do
+    case $runner in
+      "Yes" )
+        CACHE="clean"
+        break
+        ;;
+      "No" )
+        CACHE="not-clean"
+        break
+        ;;
+      * )
+        printf "${Error} ${BRed} Option invalid.${None}\n"
+        ;;
+    esac
+  done
+
+  if [[ $CACHE == "clean" ]]; then
+    rm -rf ${PWD_LOCAL}/tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}
+    printf "${Ok} Download files deleted!${None}\n"
+  fi
+}
+# }}}}
+
+# Function install Tor Browser {{{{
+function _install_tor_browser(){
+  printf "${Info} ${BCyan}Starting installing Tor Browser ...${None}\n"
+  if [[ -f "tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}.tar.xz" ]]; then
+    size="$(du tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}.tar.xz | awk '{ print $1 }')"
+    if [[ $size < "68000" ]]; then
+      rm -f tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}.tar.xz
+    fi
+  fi
+  sleep 3
+  tar -xvf tor-browser-linux${ARCHITECTURE}-${VERSION}_${LANG}.tar.xz -C /opt
+  (( UID > 0 )) && { SUDO="sudo"; }
+  $SUDO mv /opt/tor-browser_${LANG} /opt/tor-browser
+  $SUDO chmod +x /opt/tor-browser/Browser/start-tor-browser
+  $SUDO chown root.users -R /opt/tor-browser
+  $SUDO chmod 777 -R /opt/tor-browser
+  _enable_tor_root
+  # Run and register path for Tor Browser
+  cd /opt/tor-browser
+  ./start-tor-browser.desktop --register-app
+  # Copy launcher
+  cp start-tor-browser.desktop /usr/share/applications
+  chmod +x /usr/share/applications/start-tor-browser.desktop
+  cd $PWD_LOCAL
+
+cat << EOF > $HOME/.tor-browser/PATH
+ROOTPATH="/opt/tor-browser"
+ICONPATH="/usr/share/applications/start-tor-browser.desktop"
+EOF
+
+  _clean_download_file
+  printf "${Ok} ${BGreen} Installation Complete!${None}\n"
+  printf "${Info} The Tor Browser is installed in the: \"/opt/tor-browser\"\n${None}"
+  printf "Bye!\n"
+}
+# }}}}
+
+# Function uninstall Tor Browser, case has been installed with this script {{{{
+function _uninstall_tor_browser(){
+  if [[ -d $HOME/.tor-browser ]] && [[ -f $HOME/.tor-browser/PATH ]]; then
+    source $HOME/.tor-browser/PATH
+    printf "${Info} ${BCyan} Uninstall ...${None}\n"
+    rm -rf $ROOTPATH $ICONPATH $HOME/.tor-browser
+    printf "${Ok} ${Bgreen} Uninstall complete!${None}\n"
+  else
+    printf "${Warning} ${BYellow} Tor Broser is not installed or corrupted. :( ${None}\n"
+  fi
+}
+# }}}}
+
+# Menu {{{{
+case $1 in
+  install|-i )
+      _check_os
+      _catch_version_tor_browser
+      _catch_architecture
+      _select_language
+      _catch_url
+      _prepare
+      _download_tor_browser
+      _install_tor_browser
+    ;;
+  uninstall|-u)
+      _uninstall_tor_browser
+    ;;
+  credits|-c)
+      _credits
+    ;;
+  help|-h)
+      _help
+    ;;
+  *)
+    printf "Usage: $0 { install [-i] | uninstall [-u] | credits [-c] | help [-h] }\n"
+esac
+exit 0
+# }}}}
+
+# END }}}}}
